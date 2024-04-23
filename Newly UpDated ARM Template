@@ -1,0 +1,279 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        
+        "Vnet01_Location": {
+            "type": "string",
+            "defaultValue": "East US"
+        },
+        "Vnet02_Location": {
+            "type": "string",
+            "defaultValue": "West US" 
+        }
+    },
+    "functions": [],
+    "variables": {
+        "Vnet01name" : "VNET01",
+        "Vnet02name" : "VNET02",
+        "Vnet01_Subnet01name" : "WorkloadSubnet01",
+        "Vnet01_Subnet02name" : "GatewaySubnet01",
+        "Vnet02_Subnet01name" : "WorkloadSubnet02",
+        "Vnet02_Subnet02name" : "GatewaySubnet02",
+
+       "Vnet01name_addressPrefixes" : "10.0.0.0/16",
+        "Vnet02name_addressPrefixes" : "10.1.0.0/16",
+        "Vnet01_Subnet01name_addressPrefixes" : "10.0.0.0/24",
+        "Vnet01_Subnet02name_addressPrefixes" : "10.0.1.0/24",
+        "Vnet02_Subnet01name_addressPrefixes" : "10.1.0.0/24",
+        "Vnet02_Subnet02name_addressPrefixes" : "10.1.1.0/24"
+    },
+    "resources": [
+        {
+            "name": "publicIPAddress1",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2023-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "publicIPAddress1"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "dnsname1"
+                }
+            }
+        },
+        {
+            "name": "Vnet01_Subnet01NSG",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('Vnet01_Location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Vnet01_Subnet01NSG",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "[variables('Vnet01_Subnet01name_addressPrefixes')]",
+                            "destinationAddressPrefix": "[variables('Vnet01_Subnet01name_addressPrefixes')]",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Vnet01_Subnet02NSG",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('Vnet01_Location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Vnet01_Subnet02NSG",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "[variables('Vnet01_Subnet02name_addressPrefixes')]",
+                            "destinationAddressPrefix": "[variables('Vnet01_Subnet02name_addressPrefixes')]",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Vnet02_Subnet01NSG",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('Vnet02_Location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Vnet02_Subnet01NSG",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "[variables('Vnet02_Subnet01name_addressPrefixes')]",
+                            "destinationAddressPrefix": "[variables('Vnet02_Subnet01name_addressPrefixes')]",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+         {
+            "name": "Vnet02_Subnet02NSG",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('Vnet02_Location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Vnet02_Subnet02NSG",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "[variables('Vnet02_Subnet02name_addressPrefixes')]",
+                            "destinationAddressPrefix": "[variables('Vnet02_Subnet02name_addressPrefixes')]",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('Vnet01name')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('Vnet01_Location')]",
+            "tags": {
+                "displayName": "[variables('Vnet01name')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('Vnet01name_addressPrefixes')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('Vnet01_Subnet01name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('Vnet01_Subnet01name_addressPrefixes')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('Vnet01_Subnet02name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('Vnet01_Subnet02name_addressPrefixes')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+    "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+    "name": "Vnet01/Vnet01-to-Vnet02Peering",
+    "apiVersion": "2023-04-01",
+    "location": "[parameters('Vnet01_Location')]",
+    "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet01name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet02name'))]"
+    ],
+    "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": false,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet02name'))]"
+        }
+    }
+},
+
+        {
+            "name": "[variables('Vnet02name')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2023-04-01",
+            "location": "[parameters('Vnet02_Location')]",
+            "tags": {
+                "displayName": "[variables('Vnet02name')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('Vnet02name_addressPrefixes')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('Vnet02_Subnet01name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('Vnet02_Subnet01name_addressPrefixes')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('Vnet02_Subnet02name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('Vnet02_Subnet02name_addressPrefixes')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+    "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+    "name": "Vnet02/Vnet02-to-Vnet01Peering",
+    "apiVersion": "2023-04-01",
+    "location": "[parameters('Vnet02_Location')]",
+    "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet02name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet01name'))]"
+    ],
+    "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": false,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet01name'))]"
+        }
+    }
+},
+
+        {
+            "name": "virtualNetworkGateway1",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2023-04-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddress1')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet01name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Vnet02name'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "vnetGatewayConfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Vnet01name'), variables('Vnet01_Subnet02name'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddress1')]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "Basic",
+                    "tier": "Basic"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "PolicyBased",
+                "enableBgp": true
+            }
+        }
+    ],
+    "outputs": {}
+}
